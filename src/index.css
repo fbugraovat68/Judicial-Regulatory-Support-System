@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Cairo", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light;
+  color: #1a1a1a;
+  background-color: #ffffff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* RTL support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+
+/* Ant Design overrides */
+.ant-btn-primary {
+  background-color: #4f008c !important;
+  border-color: #4f008c !important;
+}
+
+.ant-btn-primary:hover {
+  background-color: #3a0066 !important;
+  border-color: #3a0066 !important;
+}
+
+/* Custom Tab Styles */
+.custom-tab-container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+.custom-tab-button {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  background: transparent;
+}
+
+.custom-tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #4f008c 0%, #7c3aed 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: -1;
+}
+
+.custom-tab-button:hover {
+  background: #f3f4f6;
+  color: #374151;
+  transform: none;
+  box-shadow: none;
+}
+
+.custom-tab-button:hover::before {
+  opacity: 0;
+}
+
+.custom-tab-button.active {
+  background: linear-gradient(135deg, #4f008c 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: none;
+  transform: none;
+}
+
+.custom-tab-button.active:hover {
+  background: linear-gradient(135deg, #4f008c 0%, #7c3aed 100%);
+  color: white;
+}
+
+/* Cases Filters Styles */
+.cases-filters-card {
+  transition: all 0.3s ease;
+}
+
+.cases-filters-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.cases-filters-card .ant-card-body {
+  padding: 20px;
+}
+
+.filter-item {
+  transition: all 0.2s ease;
+}
+
+.filter-item:hover {
+  transform: translateY(-1px);
+}
+
+.filter-item .ant-select,
+.filter-item .ant-picker {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.filter-item .ant-select:hover,
+.filter-item .ant-picker:hover {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.filter-item .ant-select-focused,
+.filter-item .ant-picker-focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Search input enhancement */
+.cases-filters-card .ant-input-affix-wrapper {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.cases-filters-card .ant-input-affix-wrapper:hover {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.cases-filters-card .ant-input-affix-wrapper-focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Button enhancements */
+.cases-filters-card .ant-btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.cases-filters-card .ant-btn-primary {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border: none;
+  box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+}
+
+.cases-filters-card .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(24, 144, 255, 0.3);
+}
+
+.cases-filters-card .ant-btn-text {
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.cases-filters-card .ant-btn-text:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* Badge enhancement */
+.cases-filters-card .ant-badge-count {
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(24, 144, 255, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cases-filters-card .ant-card-body {
+    padding: 16px;
+  }
+  
+  .filter-item {
+    margin-bottom: 16px;
+  }
+}
+
+/* Animation for expand/collapse */
+.cases-filters-card .transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Divider enhancement */
+.cases-filters-card .ant-divider {
+  margin: 16px 0;
+  border-color: #f0f0f0;
+}
+
+/* Typography enhancements */
+.cases-filters-card .ant-typography {
+  color: #262626;
+}
+
+.cases-filters-card .ant-typography strong {
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+/* Search input loading enhancement */
+.cases-filters-card .ant-input-affix-wrapper .ant-spin {
+  color: #1890ff;
+}
+
+.cases-filters-card .ant-input-affix-wrapper .ant-spin-dot {
+  font-size: 12px;
+}
+
+/* Smooth transition for search icon to loading spinner */
+.cases-filters-card .ant-input-affix-wrapper .anticon,
+.cases-filters-card .ant-input-affix-wrapper .ant-spin {
+  transition: all 0.2s ease;
+}
+
+/* Debouncing state styling */
+.cases-filters-card .ant-input-affix-wrapper.debouncing {
+  border-color: #faad14;
+  box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.1);
+}
+
+.cases-filters-card .ant-input-affix-wrapper.debouncing .ant-spin {
+  color: #faad14;
+}
+
+/* Scale utilities */
+.scale-102 {
+  transform: scale(1.02);
+}
+
+.scale-105 {
+  transform: scale(1.05);
+}
+
+/* Enhanced hover effects */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+/* Glass morphism effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .custom-tab-button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 640px) {
+  .custom-tab-button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
