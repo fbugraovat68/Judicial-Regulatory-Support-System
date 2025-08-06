@@ -1,14 +1,17 @@
-import React from 'react';
-import { Modal, Form, Input, Select, DatePicker, Button, message, Switch, Row, Col } from 'antd';
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Modal, Form, Input, DatePicker, Button, message, Switch, Row, Col, Steps, Upload, Slider, Radio, Tag } from 'antd';
+import { UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useCases } from '../../hooks/useCases';
 import { useModalStore } from '@/shared/stores/modalStore';
-import { LookupSelect } from '@/shared/components/lookup';
+import { LookupSelect, LitigantSearch } from '@/shared/components/lookup';
 import { LookupTypes } from '@/shared/types/lookup';
 import { ConsultantSearch } from '@/shared/components/lookup';
 import type { CaseRequest } from '../../types/case-request';
 import { CasePriority } from '../../types/case';
+
+const { Step } = Steps;
+const { TextArea } = Input;
 
 interface CreateCaseModalProps {
   mode?: 'create' | 'edit';
@@ -20,9 +23,35 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
   const { createCase, isCreating } = useCases();
   const { isOpen, close } = useModalStore();
   const [form] = Form.useForm();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [inputTag, setInputTag] = useState('');
 
-  const handleSubmit = async (values: any) => {
+  const steps = [
+    { title: t('CASES.CASE_INFO'), key: 'caseInfo' },
+    { title: t('CASES.DECISION_INFO'), key: 'decisionInfo' }
+  ];
+
+  const handleNext = async () => {
     try {
+      await form.validateFields();
+      if (currentStep < steps.length - 1) {
+        setCurrentStep(currentStep + 1);
+      }
+    } catch (error) {
+      message.error(t('CASES.PLEASE_COMPLETE_REQUIRED_FIELDS'));
+    }
+  };
+
+  const handlePrev = () => {
+    setCurrentStep(currentStep - 1);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      
       if (mode === 'edit' && caseData) {
         // TODO: Implement edit functionality
         message.info('Edit functionality coming soon');
@@ -41,21 +70,70 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
           caseLevelId: values.caseLevel?.id,
           isAgainstStc: values.isAgainstStc,
           caseFilingDate: values.caseFilingDate?.format('YYYY-MM-DD'),
-          litigantIds: values.litigants?.map((lit: any) => lit.id) || [],
-          tags: values.tags || [],
+          litigantIds: Array.isArray(values.litigants) ? values.litigants.map((lit: any) => lit.id) : [],
+          tags: tags,
         };
 
         await createCase(createCaseRequest);
         message.success('Case created successfully');
         close('createCase');
         form.resetFields();
+        setCurrentStep(0);
+        setFileList([]);
+        setTags([]);
       }
     } catch (error) {
       message.error('Failed to create case');
     }
   };
 
-  const modalTitle = mode === 'edit' ? t('EDIT_CASE') : t('CREATE_NEW_CASE');
+  const handleTagClose = (removedTag: string) => {
+    const newTags = tags.filter(tag => tag !== removedTag);
+    setTags(newTags);
+  };
+
+  const handleTagInputConfirm = () => {
+    if (inputTag && !tags.includes(inputTag)) {
+      setTags([...tags, inputTag]);
+      setInputTag('');
+    }
+  };
+
+  const uploadProps = {
+    fileList,
+    beforeUpload: (file: File) => {
+      const isValidType = [
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/pdf',
+        'application/zip'
+      ].includes(file.type);
+      
+      if (!isValidType) {
+        message.error('You can only upload .doc, .docx, .xls, .xlsx, .pdf, .zip files!');
+        return false;
+      }
+      
+      const isLt10M = file.size / 1024 / 1024 < 10;
+      if (!isLt10M) {
+        message.error('File must be smaller than 10MB!');
+        return false;
+      }
+      
+      setFileList([...fileList, file]);
+      return false;
+    },
+    onRemove: (file: any) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    }
+  };
+
+  const modalTitle = mode === 'edit' ? t('CASES.EDIT_CASE') : t('CASES.CREATE_NEW_CASE');
 
   return (
     <Modal
@@ -64,378 +142,471 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
       onCancel={() => close('createCase')}
       footer={null}
       width={1000}
+      centered
+      closeIcon={<CloseOutlined />}
     >
+      <Steps current={currentStep} className="mb-6">
+        {steps.map(step => (
+          <Step key={step.key} title={step.title} />
+        ))}
+      </Steps>
+
       <Form
         form={form}
         layout="vertical"
-        onFinish={handleSubmit}
         initialValues={caseData}
       >
-        {/* Basic Information */}
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="name"
-              label={t('CASE_NAME')}
-              rules={[{ required: true, message: t('CASE_NAME_REQUIRED') }]}
-            >
-              <Input placeholder={t('ENTER_CASE_NAME')} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="number"
-              label={t('CASE_NUMBER')}
-              rules={[{ required: true, message: t('CASE_NUMBER_REQUIRED') }]}
-            >
-              <Input placeholder={t('ENTER_CASE_NUMBER')} />
-            </Form.Item>
-          </Col>
-        </Row>
+        {currentStep === 0 && (
+          <div>
+            {/* Step 1: Case Information */}
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="name"
+                  label={t('CASES.CASE_TITLE')}
+                  rules={[
+                    { required: true, message: t('CASES.CASE_TITLE_REQUIRED') },
+                    { max: 150, message: t('CASES.CASE_TITLE_MAX_LENGTH') }
+                  ]}
+                >
+                  <Input placeholder={t('ENTER_CASE_TITLE')} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="number"
+                  label={t('CASES.CASE_NUMBER')}
+                  rules={[{ required: true, message: t('CASES.CASE_NUMBER_REQUIRED') }]}
+                >
+                  <Input placeholder={t('ENTER_CASE_NUMBER')} />
+                </Form.Item>
+              </Col>
+            </Row>
 
-        <Form.Item
-          name="description"
-          label={t('CASE_DESCRIPTION')}
-        >
-          <Input.TextArea
-            rows={3}
-            placeholder={t('ENTER_CASE_DESCRIPTION')}
-          />
-        </Form.Item>
+            <Form.Item
+              name="description"
+              label={t('CASES.CASE_DESCRIPTION')}
+              rules={[
+                { min: 5, message: t('CASES.CASE_DESCRIPTION_MIN_LENGTH') },
+                { max: 1000, message: t('CASES.CASE_DESCRIPTION_MAX_LENGTH') }
+              ]}
+            >
+              <TextArea
+                rows={3}
+                placeholder={t('CASES.ENTER_CASE_DESCRIPTION')}
+              />
+            </Form.Item>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="isAgainstStc"
-              label={t('IS_AGAINST_STC')}
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="caseFilingDate"
-              label={t('CASE_FILING_DATE')}
-              rules={[{ required: true, message: t('CASE_FILING_DATE_REQUIRED') }]}
-            >
-              <DatePicker
-                placeholder={t('SELECT_CASE_FILING_DATE')}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="isAgainstStc"
+                  label={t('CASES.IS_AGAINST_STC')}
+                  valuePropName="checked"
+                >
+                  <Switch />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="caseFilingDate"
+                  label={t('CASES.CASE_FILING_DATE')}
+                  rules={[{ required: true, message: t('CASES.CASE_FILING_DATE_REQUIRED') }]}
+                >
+                  <DatePicker
+                    placeholder={t('CASES.SELECT_CASE_FILING_DATE')}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
-        {/* Case Classification */}
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item
-              name="caseLevel"
-              label={t('CASE_LEVEL')}
-              rules={[{ required: true, message: t('CASE_LEVEL_REQUIRED') }]}
-            >
-              <LookupSelect
-                lookupType={LookupTypes.CaseLevel}
-                placeholder={t('SELECT_CASE_LEVEL')}
-                onChange={(value) => form.setFieldValue('caseLevel', value)}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="internalClient"
-              label={t('INTERNAL_CLIENT')}
-              rules={[{ required: true, message: t('INTERNAL_CLIENT_REQUIRED') }]}
-            >
-              <LookupSelect
-                lookupType={LookupTypes.InternalClient}
-                placeholder={t('SELECT_INTERNAL_CLIENT')}
-                onChange={(value) => form.setFieldValue('internalClient', value)}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="caseType"
-              label={t('CASE_TYPE')}
-              rules={[{ required: true, message: t('CASE_TYPE_REQUIRED') }]}
-            >
-              <LookupSelect
-                lookupType={LookupTypes.CaseType}
-                placeholder={t('SELECT_CASE_TYPE')}
-                onChange={(value) => form.setFieldValue('caseType', value)}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+            {/* Case Classification */}
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item
+                  name="internalClient"
+                  label={t('CASES.INTERNAL_CLIENT')}
+                  rules={[{ required: true, message: t('CASES.INTERNAL_CLIENT_REQUIRED') }]}
+                >
+                  <LookupSelect
+                    lookupType={LookupTypes.InternalClient}
+                    placeholder={t('CASES.SELECT_INTERNAL_CLIENT')}
+                    onChange={(value) => form.setFieldValue('internalClient', value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="caseType"
+                    label={t('CASES.CASE_TYPE')}
+                  rules={[{ required: true, message: t('CASES.CASE_TYPE_REQUIRED') }]}
+                >
+                  <LookupSelect
+                    lookupType={LookupTypes.CaseType}
+                    placeholder={t('CASES.SELECT_CASE_TYPE')}
+                    onChange={(value) => form.setFieldValue('caseType', value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="lawsuitType"
+                  label={t('CASES.LAWSUIT_TYPE')}
+                  rules={[{ required: true, message: t('CASES.LAWSUIT_TYPE_REQUIRED') }]}
+                >
+                  <LookupSelect
+                    lookupType={LookupTypes.JudgmentTypes}
+                    placeholder={t('CASES.SELECT_LAWSUIT_TYPE')}
+                    onChange={(value) => form.setFieldValue('lawsuitType', value)}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item
-              name="lawsuitType"
-              label={t('LAWSUIT_TYPE')}
-              rules={[{ required: true, message: t('LAWSUIT_TYPE_REQUIRED') }]}
-            >
-              <LookupSelect
-                lookupType={LookupTypes.JudgmentTypes}
-                placeholder={t('SELECT_LAWSUIT_TYPE')}
-                onChange={(value) => form.setFieldValue('lawsuitType', value)}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="specializedCourt"
-              label={t('SPECIALIZED_COURT')}
-              rules={[{ required: true, message: t('SPECIALIZED_COURT_REQUIRED') }]}
-            >
-              <LookupSelect
-                lookupType={LookupTypes.Courts}
-                placeholder={t('SELECT_SPECIALIZED_COURT')}
-                onChange={(value) => form.setFieldValue('specializedCourt', value)}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="priority"
-              label={t('PRIORITY')}
-              rules={[{ required: true, message: t('PRIORITY_REQUIRED') }]}
-            >
-              <Select placeholder={t('SELECT_PRIORITY')}>
-                {Object.values(CasePriority).map(priority => (
-                  <Select.Option key={priority} value={priority}>
-                    {t(priority)}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item
+                  name="caseLevel"
+                  label={t('CASES.CASE_LEVEL')}
+                  rules={[{ required: true, message: t('CASES.CASE_LEVEL_REQUIRED') }]}
+                >
+                  <LookupSelect
+                    lookupType={LookupTypes.CaseLevel}
+                    placeholder={t('CASES.SELECT_CASE_LEVEL')}
+                    onChange={(value) => form.setFieldValue('caseLevel', value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="specializedCourt"
+                  label={t('CASES.SPECIALIZED_COURT')}
+                  rules={[{ required: true, message: t('CASES.SPECIALIZED_COURT_REQUIRED') }]}
+                >
+                  <LookupSelect
+                    lookupType={LookupTypes.Courts}
+                    placeholder={t('CASES.SELECT_SPECIALIZED_COURT')}
+                    onChange={(value) => form.setFieldValue('specializedCourt', value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="district"
+                  label={t('CASES.REGION')}
+                  rules={[{ required: true, message: t('CASES.REGION_REQUIRED') }]}
+                >
+                  <LookupSelect
+                    lookupType={LookupTypes.District}
+                    placeholder={t('CASES.SELECT_REGION')}
+                    onChange={(value) => form.setFieldValue('district', value)}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
-        {/* Location */}
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="district"
-              label={t('DISTRICT')}
-              rules={[{ required: true, message: t('DISTRICT_REQUIRED') }]}
-            >
-              <LookupSelect
-                lookupType={LookupTypes.District}
-                placeholder={t('SELECT_DISTRICT')}
-                onChange={(value) => form.setFieldValue('district', value)}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="city"
-              label={t('CITY')}
-              rules={[{ required: true, message: t('CITY_REQUIRED') }]}
-            >
-              <LookupSelect
-                lookupType={LookupTypes.City}
-                placeholder={t('SELECT_CITY')}
-                onChange={(value) => form.setFieldValue('city', value)}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="city"
+                  label={t('CASES.CITY')}
+                  rules={[{ required: true, message: t('CASES.CITY_REQUIRED') }]}
+                >
+                  <LookupSelect
+                    lookupType={LookupTypes.City}
+                    placeholder={t('CASES.SELECT_CITY')}
+                    onChange={(value) => form.setFieldValue('city', value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label={t('TAGS')}>
+                  <div>
+                    {tags.map(tag => (
+                      <Tag
+                        key={tag}
+                        closable
+                        onClose={() => handleTagClose(tag)}
+                      >
+                        {tag}
+                      </Tag>
+                    ))}
+                    <Input
+                      type="text"
+                      size="small"
+                      style={{ width: 100, marginLeft: 8 }}
+                      value={inputTag}
+                      onChange={e => setInputTag(e.target.value)}
+                      onBlur={handleTagInputConfirm}
+                      onPressEnter={handleTagInputConfirm}
+                      placeholder={t('CASES.ADD_TAG')}
+                    />
+                  </div>
+                </Form.Item>
+              </Col>
+            </Row>
 
-        {/* Litigants */}
-        <Form.List name="litigants">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name, ...restField }) => (
-                <Row key={key} gutter={16} align="middle">
-                  <Col span={8}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'name']}
-                      label={t('LITIGANT_NAME')}
-                      rules={[{ required: true, message: t('LITIGANT_NAME_REQUIRED') }]}
-                    >
-                      <Input placeholder={t('ENTER_LITIGANT_NAME')} />
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'email']}
-                      label={t('LITIGANT_EMAIL')}
-                      rules={[{ type: 'email', message: t('INVALID_EMAIL') }]}
-                    >
-                      <Input placeholder={t('ENTER_LITIGANT_EMAIL')} />
-                    </Form.Item>
-                  </Col>
-                  <Col span={6}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'nameAr']}
-                      label={t('LITIGANT_NAME_AR')}
-                    >
-                      <Input placeholder={t('ENTER_LITIGANT_NAME_AR')} />
-                    </Form.Item>
-                  </Col>
-                  <Col span={2}>
-                    <MinusCircleOutlined onClick={() => remove(name)} />
-                  </Col>
-                </Row>
-              ))}
-              <Form.Item>
-                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                  {t('ADD_LITIGANT')}
-                </Button>
+            {/* Litigants */}
+            <Form.Item
+              name="litigants"
+              label={t('CASES.LITIGANTS')}
+              rules={[{ required: true, message: t('CASES.LITIGANTS_REQUIRED') }]}
+            >
+              <LitigantSearch
+                placeholder={t('CASES.SELECT_LITIGANTS')}
+                mode="multiple"
+                onChange={(value) => {
+                  form.setFieldValue('litigants', value);
+                }}
+              />
+            </Form.Item>
+
+            {/* Additional Consultants - Only in create mode */}
+            {mode === 'create' && (
+              <Form.Item
+                name="additionalConsultants"
+                label={t('CASES.ADDITIONAL_CONSULTANTS')}
+              >
+                <ConsultantSearch
+                  placeholder={t('CASES.SELECT_CONSULTANTS')}
+                  mode="multiple"
+                  onChange={(value) => {
+                    form.setFieldValue('additionalConsultants', value);
+                  }}
+                />
               </Form.Item>
-            </>
-          )}
-        </Form.List>
+            )}
 
-        {/* Additional Consultants */}
-        <Form.List name="additionalConsultants">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name, ...restField }) => (
-                <Row key={key} gutter={16} align="middle">
-                  <Col span={10}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'consultant']}
-                      label={t('CONSULTANT')}
-                    >
-                      <ConsultantSearch
-                        placeholder={t('SELECT_CONSULTANT')}
-                        onChange={(value) => {
-                          const currentConsultants = form.getFieldValue('additionalConsultants') || [];
-                          currentConsultants[name] = value;
-                          form.setFieldValue('additionalConsultants', currentConsultants);
-                        }}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={2}>
-                    <MinusCircleOutlined onClick={() => remove(name)} />
-                  </Col>
-                </Row>
-              ))}
-              <Form.Item>
-                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                  {t('ADD_CONSULTANT')}
-                </Button>
+            {/* Attachments - Only in create mode */}
+            {mode === 'create' && (
+              <Form.Item label={t('ATTACHMENTS')}>
+                <Upload {...uploadProps}>
+                  <Button icon={<UploadOutlined />}>{t('CASES.UPLOAD_FILES')}</Button>
+                </Upload>
               </Form.Item>
-            </>
-          )}
-        </Form.List>
+            )}
+          </div>
+        )}
 
-        {/* Case Information */}
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item
-              name="decisionNumber"
-              label={t('DECISION_NUMBER')}
-            >
-              <Input placeholder={t('ENTER_DECISION_NUMBER')} />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="decisionDate"
-              label={t('DECISION_DATE')}
-            >
-              <DatePicker
-                placeholder={t('SELECT_DECISION_DATE')}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="fineAmount"
-              label={t('FINE_AMOUNT')}
-            >
-              <Input
-                type="number"
-                placeholder={t('ENTER_FINE_AMOUNT')}
-                min={0}
-                step={0.01}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+        {currentStep === 1 && (
+          <div>
+            {/* Step 2: Decision Information */}
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item
+                  name="fineAmount"
+                  label={t('CASES.FINE_AMOUNT')}
+                  rules={[{ required: true, message: t('CASES.FINE_AMOUNT_REQUIRED') }]}
+                >
+                  <Input
+                    type="number"
+                    placeholder={t('CASES.ENTER_FINE_AMOUNT')}
+                    min={0}
+                    step={0.01}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="lossRatio"
+                  label={t('CASES.LOSS_RATIO')}
+                  rules={[{ required: true, message: t('CASES.LOSS_RATIO_REQUIRED') }]}
+                >
+                  <Slider
+                    min={0}
+                    max={100}
+                    marks={{
+                      0: '0%',
+                      25: '25%',
+                      50: '50%',
+                      75: '75%',
+                      100: '100%'
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="priority"
+                  label={t('CASES.PRIORITY')}
+                  rules={[{ required: true, message: t('CASES.PRIORITY_REQUIRED') }]}
+                >
+                  <Radio.Group>
+                    {Object.values(CasePriority).map(priority => (
+                      <Radio key={priority} value={priority}>
+                        {t(priority)}
+                      </Radio>
+                    ))}
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            </Row>
 
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item
-              name="noticeNumber"
-              label={t('NOTICE_NUMBER')}
-            >
-              <Input placeholder={t('ENTER_NOTICE_NUMBER')} />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="noticeDate"
-              label={t('NOTICE_DATE')}
-            >
-              <DatePicker
-                placeholder={t('SELECT_NOTICE_DATE')}
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="lossRatio"
-              label={t('LOSS_RATIO')}
-            >
-              <Input
-                type="number"
-                placeholder={t('ENTER_LOSS_RATIO')}
-                min={0}
-                max={100}
-                step={0.01}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item
+                  name="decisionNumber"
+                  label={t('CASES.DECISION_NUMBER')}
+                >
+                  <Input placeholder={t('CASES.ENTER_DECISION_NUMBER')} />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="decisionDate"
+                    label={t('CASES.DECISION_DATE')}
+                >
+                  <DatePicker
+                    placeholder={t('CASES.SELECT_DECISION_DATE')}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="noticeNumber"
+                  label={t('CASES.NOTICE_NUMBER')}
+                >
+                  <Input placeholder={t('CASES.ENTER_NOTICE_NUMBER')} />
+                </Form.Item>
+              </Col>
+            </Row>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="isConfidential"
-              label={t('IS_CONFIDENTIAL')}
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item
+                  name="noticeDate"
+                  label={t('CASES.NOTICE_DATE')}
+                >
+                  <DatePicker
+                    placeholder={t('CASES.SELECT_NOTICE_DATE')}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="inquiryNumber"
+                  label={t('CASES.INQUIRY_NUMBER')}
+                >
+                  <Input placeholder={t('CASES.ENTER_INQUIRY_NUMBER')} />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="inquiryDate"
+                  label={t('CASES.INQUIRY_DATE')}
+                >
+                  <DatePicker
+                    placeholder={t('CASES.SELECT_INQUIRY_DATE')}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item
+                  name="grievanceRequestNumber"
+                  label={t('CASES.GRIEVANCE_REQUEST_NUMBER')}
+                >
+                  <Input placeholder={t('CASES.ENTER_GRIEVANCE_REQUEST_NUMBER')} />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="grievanceRequestDate"
+                  label={t('CASES.GRIEVANCE_REQUEST_DATE')}
+                >
+                  <DatePicker
+                    placeholder={t('CASES.SELECT_GRIEVANCE_REQUEST_DATE')}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="repaymentAmount"
+                  label={t('CASES.REPAYMENT_AMOUNT')}
+                >
+                  <Input
+                    type="number"
+                    placeholder={t('CASES.ENTER_REPAYMENT_AMOUNT')}
+                    min={0}
+                    step={0.01}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item
+                  name="repaymentDate"
+                    label={t('CASES.REPAYMENT_DATE')}
+                >
+                  <DatePicker
+                    placeholder={t('CASES.SELECT_REPAYMENT_DATE')}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  name="isConfidential"
+                  label={t('CASES.IS_CONFIDENTIAL')}
+                  valuePropName="checked"
+                >
+                  <Switch />
+                </Form.Item>
+              </Col>
+            </Row>
+
             <Form.Item
               name="consultantOpinion"
-              label={t('CONSULTANT_OPINION')}
+              label={t('CASES.CONSULTANT_OPINION')}
+              rules={[
+                { min: 5, message: t('CASES.CONSULTANT_OPINION_MIN_LENGTH') },
+                { max: 1000, message: t('CASES.CONSULTANT_OPINION_MAX_LENGTH') }
+              ]}
             >
-              <Input.TextArea
-                rows={2}
-                placeholder={t('ENTER_CONSULTANT_OPINION')}
+              <TextArea
+                rows={4}
+                placeholder={t('CASES.ENTER_CONSULTANT_OPINION')}
               />
             </Form.Item>
-          </Col>
-        </Row>
+          </div>
+        )}
 
-        {/* Action Buttons */}
-        <div className="flex justify-end space-x-2 mt-6">
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-6">
           <Button onClick={() => close('createCase')}>
-            {t('CANCEL')}
+            {t('CASES.CANCEL')}
           </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={isCreating}
-          >
-            {mode === 'edit' ? t('UPDATE') : t('CREATE')}
-          </Button>
+          
+          <div className="space-x-2">
+            {currentStep > 0 && (
+              <Button onClick={handlePrev}>
+                {t('CASES.BACK')}
+              </Button>
+            )}
+            
+            {currentStep < steps.length - 1 ? (
+              <Button type="primary" onClick={handleNext}>
+                {t('CASES.NEXT')}
+              </Button>
+            ) : (
+              <Button
+                type="primary"
+                onClick={handleSubmit}
+                loading={isCreating}
+              >
+                {mode === 'edit' ? t('CASES.UPDATE') : t('CASES.CREATE')}
+              </Button>
+            )}
+          </div>
         </div>
       </Form>
     </Modal>

@@ -10,20 +10,17 @@ export interface LookupItem extends BaseItem {
   code: string;
   cities?: BaseItem[];
 }
-
-// User interface for consultants
-export interface User {
+export interface Consultant {
   id: number;
-  nameEn: string;
-  nameAr: string;
+  name: string;
+  nameAr?: string;
   email?: string;
 }
-
-// Litigant interface
 export interface Litigant {
   id: number;
   name: string;
   nameAr?: string;
+  email?: string;
 }
 
 // Lookup types const

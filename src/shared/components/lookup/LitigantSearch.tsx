@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Select, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
-import type { User } from '../../types/lookup';
-import { useLookup } from '../../hooks/useLookup';
+import type { Litigant } from '@/shared/types/lookup';
+import { useLookup } from '@/shared/hooks/useLookup';
 
-interface ConsultantSearchProps {
-    value?: User | number | string;
-    onChange: (value: User | null) => void;
+interface LitigantSearchProps {
+    value?: Litigant[] | Litigant | number | string;
+    onChange: (value: Litigant[] | Litigant | null) => void;
     placeholder?: string;
     allowClear?: boolean;
     disabled?: boolean;
@@ -14,9 +14,10 @@ interface ConsultantSearchProps {
     style?: React.CSSProperties;
     className?: string;
     debounceMs?: number;
+    mode?: 'multiple' | 'tags';
 }
 
-export const ConsultantSearch: React.FC<ConsultantSearchProps> = ({
+export const LitigantSearch: React.FC<LitigantSearchProps> = ({
     value,
     onChange,
     placeholder,
@@ -25,59 +26,65 @@ export const ConsultantSearch: React.FC<ConsultantSearchProps> = ({
     size = 'middle',
     style,
     className,
-    debounceMs = 300
+    debounceMs = 300,
+    mode = 'multiple'
 }) => {
     const { t } = useTranslation();
-    const { searchConsultants } = useLookup();
+    const { searchLitigants } = useLookup();
 
-    const [consultants, setConsultants] = useState<User[]>([]);
+    const [litigants, setLitigants] = useState<Litigant[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchValue, setSearchValue] = useState('');
 
-    // Debounced search effect
     useEffect(() => {
         const timeoutId = setTimeout(async () => {
             if (searchValue.trim()) {
                 setLoading(true);
                 try {
-                    const results = await searchConsultants(searchValue);
-                    setConsultants(results);
+                    const results = await searchLitigants(searchValue);
+                    setLitigants(results);
                 } catch (error) {
                     console.error('Search error:', error);
-                    setConsultants([]);
+                    setLitigants([]);
                 } finally {
                     setLoading(false);
                 }
             } else {
-                setConsultants([]);
+                setLitigants([]);
             }
         }, debounceMs);
 
         return () => clearTimeout(timeoutId);
-    }, [searchValue, searchConsultants, debounceMs]);
+    }, [searchValue, searchLitigants, debounceMs]);
 
-    // Handle value conversion
     const getValue = () => {
         if (!value) return undefined;
+        if (Array.isArray(value)) {
+            return value.map(item => typeof item === 'object' ? item.id : item);
+        }
         if (typeof value === 'object') return value.id;
         return value;
     };
 
-    // Handle option selection
-    const handleChange = (selectedValue: number | string) => {
-        const selectedConsultant = consultants.find(consultant => consultant.id === selectedValue);
-        onChange(selectedConsultant || null);
+    const handleChange = (selectedValue: number | string | (number | string)[]) => {
+        if (Array.isArray(selectedValue)) {
+            const selectedLitigants = selectedValue.map(id => 
+                litigants.find(litigant => litigant.id === id)
+            ).filter(Boolean) as Litigant[];
+            onChange(selectedLitigants);
+        } else {
+            const selectedLitigant = litigants.find(litigant => litigant.id === selectedValue);
+            onChange(selectedLitigant || null);
+        }
     };
 
-    // Handle search input change
     const handleSearch = (input: string) => {
         setSearchValue(input);
     };
 
-    // Get display name based on current language
-    const getDisplayName = (consultant: User) => {
+    const getDisplayName = (litigant: Litigant) => {
         const currentLang = t('LANGUAGE') || 'en';
-        return currentLang === 'ar' ? consultant.nameAr : consultant.nameEn;
+        return currentLang === 'ar' ? litigant.nameAr : litigant.name;
     };
 
     return (
@@ -85,23 +92,24 @@ export const ConsultantSearch: React.FC<ConsultantSearchProps> = ({
             value={getValue()}
             onChange={handleChange}
             onSearch={handleSearch}
-            placeholder={placeholder || t('SEARCH_CONSULTANTS')}
+            placeholder={placeholder || t('SEARCH_LITIGANTS')}
             allowClear={allowClear}
             disabled={disabled}
             loading={loading}
             showSearch
             filterOption={false}
+            mode={mode}
             size={size}
             style={style}
             className={className}
             notFoundContent={loading ? <Spin size="small" /> : t('NO_DATA')}
         >
-            {consultants.map((consultant) => (
-                <Select.Option key={consultant.id} value={consultant.id} label={getDisplayName(consultant)}>
+            {litigants.map((litigant) => (
+                <Select.Option key={litigant.id} value={litigant.id} label={getDisplayName(litigant)}>
                     <div>
-                        <div>{getDisplayName(consultant)}</div>
-                        {consultant.email && (
-                            <div className="text-xs text-gray-500">{consultant.email}</div>
+                        <div>{getDisplayName(litigant)}</div>
+                        {litigant.email && (
+                            <div className="text-xs text-gray-500">{litigant.email}</div>
                         )}
                     </div>
                 </Select.Option>
