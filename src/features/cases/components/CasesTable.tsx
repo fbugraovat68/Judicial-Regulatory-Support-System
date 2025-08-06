@@ -7,7 +7,6 @@ interface CasesTableProps {
     cases: any[];
     total: number;
     pageData: any;
-    rowSelection: any;
     isLoading: boolean;
     onTableChange: (pagination: any) => void;
     onViewCase: (caseId: number) => void;
@@ -20,7 +19,6 @@ export const CasesTable: React.FC<CasesTableProps> = ({
     cases,
     total,
     pageData,
-    rowSelection,
     isLoading,
     onTableChange
 }) => {
@@ -32,7 +30,6 @@ export const CasesTable: React.FC<CasesTableProps> = ({
                 columns={columns}
                 dataSource={cases}
                 rowKey="id"
-                rowSelection={rowSelection}
                 pagination={{
                     current: pageData.page || 1,
                     pageSize: pageData.size || 10,

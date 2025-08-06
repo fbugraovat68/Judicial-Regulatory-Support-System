@@ -207,7 +207,15 @@
     "UPLOAD_FILES": "رفع الملفات",
     "SEARCH_LITIGANTS": "البحث في الخصوم",
     "SEARCH_CONSULTANTS": "البحث في المستشارين",
-    "NO_DATA": "لا توجد بيانات"
+    "NO_DATA": "لا توجد بيانات",
+    "BASIC_INFORMATION": "المعلومات الأساسية",
+    "CASE_CLASSIFICATION": "تصنيف القضية",
+    "LOCATION": "الموقع",
+    "PARTIES": "الأطراف",
+    "FINANCIAL_INFORMATION": "المعلومات المالية",
+    "DECISION_INFORMATION": "معلومات القرار",
+    "NOTICE_INFORMATION": "معلومات الإشعار",
+    "GRIEVANCE_INFORMATION": "معلومات التظلم"
   },
   "DOCUMENTS": {
     "DOCUMENT": "مستند",

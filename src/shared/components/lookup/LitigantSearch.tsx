@@ -89,20 +89,21 @@ export const LitigantSearch: React.FC<LitigantSearchProps> = ({
 
     return (
         <Select
+            showSearch
             value={getValue()}
             onChange={handleChange}
             onSearch={handleSearch}
-            placeholder={placeholder || t('SEARCH_LITIGANTS')}
+            placeholder={placeholder || t('CASES.SEARCH_LITIGANTS')}
             allowClear={allowClear}
             disabled={disabled}
             loading={loading}
-            showSearch
             filterOption={false}
+            defaultActiveFirstOption={false}
             mode={mode}
             size={size}
             style={style}
             className={className}
-            notFoundContent={loading ? <Spin size="small" /> : t('NO_DATA')}
+            notFoundContent={loading ? <Spin size="small" /> : t('CASES.NO_DATA')}
         >
             {litigants.map((litigant) => (
                 <Select.Option key={litigant.id} value={litigant.id} label={getDisplayName(litigant)}>

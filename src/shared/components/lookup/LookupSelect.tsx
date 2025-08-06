@@ -105,7 +105,7 @@ export const LookupSelect: React.FC<LookupSelectProps> = ({
       size={size}
       style={style}
       className={className}
-      notFoundContent={loading ? <Spin size="small" /> : t('NO_DATA')}
+      notFoundContent={loading ? <Spin size="small" /> : t('CASES.NO_DATA')}
     >
       {safeItems.map((item) => {
         const optionValue = item[codeField] as string | number;

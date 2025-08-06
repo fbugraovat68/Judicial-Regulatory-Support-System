@@ -21,7 +21,7 @@ export default {
         info: "#1890ff",
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Cairo', 'system-ui', 'sans-serif'],
       },
       spacing: {
         '18': '4.5rem',

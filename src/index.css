@@ -214,7 +214,7 @@ body {
   .cases-filters-card .ant-card-body {
     padding: 16px;
   }
-  
+
   .filter-item {
     margin-bottom: 16px;
   }
@@ -304,4 +304,90 @@ body {
     padding: 6px 10px;
     font-size: 12px;
   }
+}
+
+
+.create-case-form .ant-form-item {
+  margin-bottom: 16px !important;
+}
+
+.create-case-form .ant-input,
+.create-case-form .ant-input-affix-wrapper,
+.create-case-form .ant-select-selector,
+.create-case-form .ant-picker,
+.create-case-form .ant-input-number,
+.create-case-form .ant-select-multiple .ant-select-selector {
+  border-radius: 6px !important;
+  height: 40px !important;
+  border: 1px solid #d9d9d9 !important;
+  transition: all 0.2s !important;
+}
+
+.create-case-form .ant-input {
+  padding: 4px 11px !important;
+}
+
+.create-case-form .ant-input:hover,
+.create-case-form .ant-input-affix-wrapper:hover,
+.create-case-form .ant-select-selector:hover,
+.create-case-form .ant-picker:hover {
+  border-color: #4096ff !important;
+}
+
+.create-case-form .ant-input:focus,
+.create-case-form .ant-input-affix-wrapper:focus,
+.create-case-form .ant-select-selector:focus,
+.create-case-form .ant-picker:focus {
+  border-color: #4096ff !important;
+  box-shadow: 0 0 0 2px rgba(64, 150, 255, 0.2) !important;
+}
+
+.create-case-form .ant-select-multiple .ant-select-selector {
+  min-height: 40px !important;
+  height: auto !important;
+}
+
+.create-case-form .ant-input[disabled],
+.create-case-form .ant-select-disabled .ant-select-selector {
+  background-color: #f5f5f5 !important;
+  border-color: #d9d9d9 !important;
+  color: rgba(0, 0, 0, 0.25) !important;
+}
+
+.create-case-form textarea {
+  border-radius: 6px !important;
+  height: 120px !important;
+  border: 1px solid #d9d9d9 !important;
+  transition: all 0.2s !important;
+}
+
+.create-case-form input[type="text"] {
+  border-radius: 6px !important;
+  height: 40px !important;
+  border: 1px solid #d9d9d9 !important;
+  transition: all 0.2s !important;
+}
+
+.create-case-form input[type="text"]:hover,
+.create-case-form input[type="text"]:focus {
+  border-color: #4096ff !important;
+  box-shadow: none !important;
+}
+
+.create-case-form input[type="text"]:focus {
+  border-color: #4096ff !important;
+  box-shadow: none !important;
+}
+
+/* Remove focus color from Select component input */
+.create-case-form .ant-select-selector input:focus {
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.create-case-form .ant-select:focus .ant-select-selector,
+.create-case-form .ant-select-focused .ant-select-selector {
+  border-color: #d9d9d9 !important;
+  box-shadow: none !important;
 }

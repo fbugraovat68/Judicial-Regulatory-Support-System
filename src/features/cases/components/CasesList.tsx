@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Button, Space, Typography } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,6 @@ export const CasesList: React.FC = () => {
     const { filters, updateFilters, resetFilters, setPageData, pageData } = useFiltersStore();
 
     const [searchText, setSearchText] = useState('');
-    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [caseToDelete, setCaseToDelete] = useState<number | null>(null);
 
@@ -62,14 +61,6 @@ export const CasesList: React.FC = () => {
             size: pagination.pageSize
         });
     };
-
-    // Row selection
-    const rowSelection = useMemo(() => ({
-        selectedRowKeys,
-        onChange: (newSelectedRowKeys: React.Key[]) => {
-            setSelectedRowKeys(newSelectedRowKeys);
-        },
-    }), [selectedRowKeys]);
 
     return (
         <div className="space-y-6">
@@ -111,7 +102,6 @@ export const CasesList: React.FC = () => {
                 cases={cases}
                 total={total}
                 pageData={pageData}
-                rowSelection={rowSelection}
                 isLoading={isLoading}
                 onTableChange={handleTableChange}
                 onViewCase={handleViewCase}

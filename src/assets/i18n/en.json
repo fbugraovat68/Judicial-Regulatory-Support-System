@@ -207,7 +207,15 @@
     "UPLOAD_FILES": "Upload Files",
     "SEARCH_LITIGANTS": "Search litigants",
     "SEARCH_CONSULTANTS": "Search consultants",
-    "NO_DATA": "No data found"
+    "NO_DATA": "No data found",
+    "BASIC_INFORMATION": "Basic Information",
+    "CASE_CLASSIFICATION": "Case Classification",
+    "LOCATION": "Location",
+    "PARTIES": "Parties",
+    "FINANCIAL_INFORMATION": "Financial Information",
+    "DECISION_INFORMATION": "Decision Information",
+    "NOTICE_INFORMATION": "Notice Information",
+    "GRIEVANCE_INFORMATION": "Grievance Information"
   },
   "DOCUMENTS": {
     "DOCUMENT": "Document",
