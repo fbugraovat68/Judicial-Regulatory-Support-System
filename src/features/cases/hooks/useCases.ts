@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { caseService } from '../services/caseService';
 import { useFiltersStore } from '../stores/filtersStore';
-import type { UpdateCaseRequest } from '../types/case';
+import type { CaseRequest } from '../types/case-request';
 
 export const useCases = () => {
   const queryClient = useQueryClient();
@@ -26,7 +26,7 @@ export const useCases = () => {
   });
 
   const updateCaseMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateCaseRequest }) =>
+    mutationFn: ({ id, data }: { id: number; data: CaseRequest }) =>
       caseService.updateCase(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cases'] });
@@ -51,9 +51,9 @@ export const useCases = () => {
     refetch,
 
     // Mutations
-    createCase: createCaseMutation.mutate,
-    updateCase: updateCaseMutation.mutate,
-    deleteCase: deleteCaseMutation.mutate,
+    createCase: createCaseMutation.mutateAsync,
+    updateCase: updateCaseMutation.mutateAsync,
+    deleteCase: deleteCaseMutation.mutateAsync,
 
     // Loading states
     isCreating: createCaseMutation.isPending,
@@ -74,7 +74,7 @@ export const useCase = (id: number | null) => {
   });
 
   const updateCaseMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateCaseRequest }) =>
+    mutationFn: ({ id, data }: { id: number; data: CaseRequest }) =>
       caseService.updateCase(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['case', id] });
@@ -94,8 +94,8 @@ export const useCase = (id: number | null) => {
     isLoading,
     error,
     refetch,
-    updateCase: updateCaseMutation.mutate,
-    deleteCase: deleteCaseMutation.mutate,
+    updateCase: updateCaseMutation.mutateAsync,
+    deleteCase: deleteCaseMutation.mutateAsync,
     isUpdating: updateCaseMutation.isPending,
     isDeleting: deleteCaseMutation.isPending,
   };

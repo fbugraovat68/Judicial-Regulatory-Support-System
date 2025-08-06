@@ -172,30 +172,6 @@ export interface CaseEvent {
   isCompleted: boolean;
 }
 
-// Create Case Request Interface
-export interface CreateCaseRequest {
-  name: string;
-  description?: string;
-  caseTypeId: number;
-  priority: CasePriority;
-  internalClientId: number;
-  lawsuitTypeId: number;
-  specializedCourtId: number;
-  districtId: number;
-  cityId: number;
-  caseLevelId: number;
-  isAgainstStc: boolean;
-  caseFilingDate: string;
-  litigantIds: number[];
-  tags?: string[];
-}
-
-// Update Case Request Interface
-export interface UpdateCaseRequest extends Partial<CreateCaseRequest> {
-  state?: CaseStatus;
-  assignedConsultantId?: number;
-  additionalConsultantIds?: number[];
-}
 
 // Case Statistics Interface
 export interface CaseStatistics {

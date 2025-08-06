@@ -1,9 +1,10 @@
 import type {
-  CaseDetails, CasesFilterCriteria, CreateCaseRequest, UpdateCaseRequest,
+  CaseDetails, CasesFilterCriteria,
   CaseNote, CaseDocument, CaseTeamMember, CaseJudgement, CaseEvent
 } from '@/features/cases/types/case';
 import type { PaginatedResponse } from '@/shared/types';
 import api, { formDataApi } from '@/shared/utils/api';
+import type { CaseRequest } from '../types/case-request';
 
 const API_URL = '/api/v1/cases';
 
@@ -21,13 +22,13 @@ export const caseService = {
   },
 
   // Create new case
-  createCase: async (caseData: CreateCaseRequest): Promise<CaseDetails> => {
-    const response = await api.post(API_URL, caseData);
+  createCase: async (caseData: FormData): Promise<CaseDetails> => {
+    const response = await formDataApi.post(API_URL, caseData);
     return response.data.payload;
   },
 
   // Update case
-  updateCase: async (id: number, caseData: UpdateCaseRequest): Promise<CaseDetails> => {
+  updateCase: async (id: number, caseData: CaseRequest): Promise<CaseDetails> => {
     const response = await api.put(`${API_URL}/${id}`, caseData);
     return response.data.payload;
   },

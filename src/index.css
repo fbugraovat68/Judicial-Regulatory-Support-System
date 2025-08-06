@@ -354,6 +354,33 @@ body {
   color: rgba(0, 0, 0, 0.25) !important;
 }
 
+/* Upload Dragger Styling */
+.create-case-form .upload-dragger.ant-upload-drag {
+  border-radius: 6px !important;
+  border: 2px dashed #d9d9d9 !important;
+  background-color: #fafafa !important;
+  transition: all 0.3s ease !important;
+}
+
+.create-case-form .upload-dragger.ant-upload-drag:hover {
+  border-color: #1890ff !important;
+  background-color: #f0f7ff !important;
+}
+
+.create-case-form .upload-dragger .ant-upload-btn {
+  padding: 32px 16px !important;
+}
+
+.create-case-form .upload-dragger .ant-upload-text {
+  color: #1890ff !important;
+  margin: 16px 0 8px 0 !important;
+}
+
+.create-case-form .upload-dragger .ant-upload-hint {
+  color: #8c8c8c !important;
+  margin-bottom: 16px !important;
+}
+
 .create-case-form textarea {
   border-radius: 6px !important;
   height: 120px !important;

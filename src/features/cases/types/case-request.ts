@@ -64,5 +64,5 @@ export interface CaseRequest {
     additionalConsultants: AdditionalConsultant[];
     tags: Tag[];
     caseInformation: CaseInformation;
-    documents: CaseDocument;
+    documents?: CaseDocument;
 }
