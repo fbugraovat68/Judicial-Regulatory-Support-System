@@ -21,13 +21,13 @@ export const DeleteCaseModal: React.FC<DeleteCaseModalProps> = ({
         <Modal
             centered={true}
             closable={false}
-            title={t('CASES.CONFIRM_DELETE')}
+            title={<span className='text-primary font-bold text-lg'>{t('CASES.CONFIRM_DELETE')}</span>}
             open={visible}
             onOk={onConfirm}
             onCancel={onCancel}
             confirmLoading={isDeleting}
         >
-            <p>{t('CASES.DELETE_CASE_CONFIRMATION')}</p>
+            <p className='text-gray-600'>{t('CASES.DELETE_CASE_CONFIRMATION')}</p>
         </Modal>
     );
 }; 
