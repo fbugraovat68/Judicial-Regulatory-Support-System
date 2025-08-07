@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tabs, Card, Table, Button, Space, Modal, Form, Input, Select, Tag, Typography, message } from 'antd';
+import { Tabs, Card, Table, Button, Space, Modal, Form, Input, Select, Tag, Typography, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAdmin } from '@/features/admin/hooks/useAdmin';
 import { LoadingSpinner } from '@/shared/components/common/LoadingSpinner';
@@ -20,41 +20,43 @@ export const Admin: React.FC = () => {
   const handleCreateUser = async (values: any) => {
     try {
       await createUser(values);
-      message.success('User created successfully');
+      notification.success({ message: 'User created successfully' });
       setIsUserModalOpen(false);
       form.resetFields();
     } catch (error) {
-      message.error('Failed to create user');
+      notification.error({ message: 'Failed to create user' });
     }
   };
 
   const handleUpdateUser = async (values: any) => {
     try {
       await updateUser({ id: editingUser.id, data: values });
-      message.success('User updated successfully');
+      notification.success({ message: 'User updated successfully' });
       setIsUserModalOpen(false);
       setEditingUser(null);
       form.resetFields();
     } catch (error) {
-      message.error('Failed to update user');
+      notification.error({ message: 'Failed to update user' });
     }
   };
 
   const handleDeleteUser = async (userId: number) => {
     try {
       await deleteUser(userId);
-      message.success('User deleted successfully');
+      notification.success({ message: 'User deleted successfully' });
     } catch (error) {
-      message.error('Failed to delete user');
+      notification.error({ message: 'Failed to delete user' });
     }
   };
 
   const handleSettingChange = async (settingId: number, value: string) => {
     try {
       await updateSetting({ id: settingId, value });
-      message.success('Setting updated successfully');
+      notification.success({ message: 'Setting updated successfully' });
     } catch (error) {
-      message.error('Failed to update setting');
+      notification.error({
+        message: 'Failed to update setting'
+      });
     }
   };
 

@@ -311,7 +311,7 @@ body {
   margin-bottom: 16px !important;
 }
 
-.create-case-form .ant-input,
+.create-case-form .ant-input:not(textarea),
 .create-case-form .ant-input-affix-wrapper,
 .create-case-form .ant-select-selector,
 .create-case-form .ant-picker,

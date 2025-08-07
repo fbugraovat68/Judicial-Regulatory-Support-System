@@ -1,4 +1,4 @@
-import { LookupTypes, type LookupItem, type User, type Litigant } from '../types/lookup';
+import { LookupTypes, type LookupItem, type Consultant, type Litigant } from '../types/lookup';
 import api from '../utils/api';
 
 export const lookupService = {
@@ -47,6 +47,7 @@ export const lookupService = {
     // Search litigants
     getLitigants: async (query: string, limit: number = 999): Promise<Litigant[]> => {
         try {
+            debugger
             const criteria = query ? { query, limit } : { size: 10, page: 0 };
             const params = new URLSearchParams(criteria as any);
             const endpoint = query ? '/search' : '';
@@ -67,7 +68,7 @@ export const lookupService = {
     },
 
     // Search consultants
-    getConsultants: async (query: string, limit: number = 999): Promise<User[]> => {
+    getConsultants: async (query: string, limit: number = 999): Promise<Consultant[]> => {
         try {
             const criteria = query ? { query, limit } : { size: 10, page: 0 };
             const params = new URLSearchParams(criteria as any);
@@ -89,7 +90,7 @@ export const lookupService = {
     },
 
     // Search users
-    getUsers: async (query: string, limit: number = 999): Promise<User[]> => {
+    getUsers: async (query: string, limit: number = 999): Promise<Consultant[]> => {
         try {
             const criteria = query ? { query, limit } : { size: 10, page: 0 };
             const params = new URLSearchParams(criteria as any);

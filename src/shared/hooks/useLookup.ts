@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useLookupContext } from '../contexts/LookupContext';
-import { LookupTypes, type User, type Litigant } from '../types/lookup';
+import { LookupTypes, type Consultant, type Litigant } from '../types/lookup';
 import { lookupService } from '../services/lookupService';
 
 export function useLookup() {
@@ -50,7 +50,7 @@ export function useLookup() {
     }, [state.cities, dispatch]);
 
     // Search consultants
-    const searchConsultants = useCallback(async (query: string, limit: number = 999): Promise<User[]> => {
+    const searchConsultants = useCallback(async (query: string, limit: number = 999): Promise<Consultant[]> => {
         try {
             return await lookupService.getConsultants(query, limit);
         } catch (error) {
@@ -62,6 +62,7 @@ export function useLookup() {
     // Search litigants
     const searchLitigants = useCallback(async (query: string, limit: number = 999): Promise<Litigant[]> => {
         try {
+            debugger
             return await lookupService.getLitigants(query, limit);
         } catch (error) {
             console.error('Error searching litigants:', error);
@@ -70,7 +71,7 @@ export function useLookup() {
     }, []);
 
     // Search users
-    const searchUsers = useCallback(async (query: string, limit: number = 999): Promise<User[]> => {
+    const searchUsers = useCallback(async (query: string, limit: number = 999): Promise<Consultant[]> => {
         try {
             return await lookupService.getUsers(query, limit);
         } catch (error) {

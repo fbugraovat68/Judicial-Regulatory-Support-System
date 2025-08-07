@@ -92,16 +92,16 @@ export interface CaseDetails {
 
 // Cases Filter Criteria Interface
 export interface CasesFilterCriteria {
-    size: number;
-    page: number;
-    searchKey?: string | null;
-    sort?: string | null;
-    fromPeriod?: string | null;
-    toPeriod?: string | null;
-    finalResultId?: string | null;
-    lawsuitTypeId?: string | null;
-    courtId?: string | null;
-    state?: string | null;
+  size: number;
+  page: number;
+  searchKey?: string | null;
+  sort?: string | null;
+  fromPeriod?: string | null;
+  toPeriod?: string | null;
+  finalResultId?: string | null;
+  lawsuitTypeId?: string | null;
+  courtId?: string | null;
+  state?: string | null;
 }
 
 // Case Note Interface
@@ -183,4 +183,13 @@ export interface CaseStatistics {
   casesByStatus: Record<CaseStatus, number>;
   casesByPriority: Record<CasePriority, number>;
   casesByType: Record<string, number>;
+}
+
+
+export interface DownloadableFile {
+  content: Base64URLString;
+  itemName: string;
+  mimType: string;
+  originalFileName: string;
+  size: number;
 }

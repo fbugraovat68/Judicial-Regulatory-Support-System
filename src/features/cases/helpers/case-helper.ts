@@ -1,5 +1,6 @@
-import type { FormInstance } from "antd";
+import type { FormInstance, UploadFile } from "antd";
 import type { CaseRequest } from "../types/case-request";
+import { isDayjs } from "dayjs";
 
 export class CaseHelper {
 
@@ -9,7 +10,7 @@ export class CaseHelper {
             name: allValues.name,
             description: allValues.description,
             isAgainstStc: allValues.isAgainstStc || false,
-            caseFilingDate: new Date(allValues.caseFilingDate).toISOString().replace('Z', ''),
+            caseFilingDate: allValues.caseFilingDate,
             caseLevel: allValues.caseLevel,
             internalClient: allValues.internalClient,
             caseType: allValues.caseType,
@@ -19,18 +20,18 @@ export class CaseHelper {
             city: allValues.city,
             litigants: Array.isArray(allValues.litigants) ? allValues.litigants : [],
             additionalConsultants: Array.isArray(allValues.additionalConsultants) ? allValues.additionalConsultants : [],
-            tags: tags.map((tag: string) => ({ id: Date.now() + Math.random(), value: tag })),
             caseInformation: { ...allValues.caseInformation, caseNumber: allValues.number },
+            tags
         };
     }
 
-    static preparePayloadAsFormData(casePayload: CaseRequest, fileList: File[]): FormData {
+    static preparePayloadAsFormData(casePayload: CaseRequest, fileList: UploadFile[]): FormData {
         const formData = new FormData();
         const { cities, ...districtWithoutCities } = casePayload.district;
         casePayload.district = districtWithoutCities;
 
         const processValue = (value: any, keyPath: string) => {
-            if (value instanceof Date) {
+            if (value instanceof Date || isDayjs(value)) {
                 formData.append(keyPath, value.toISOString().replace('Z', ''));
             } else if (value instanceof Array) {
                 value.forEach((item, index) => {
@@ -50,11 +51,12 @@ export class CaseHelper {
             processValue(value, key);
         }
 
-        fileList.forEach((file: any, i: number) => {
-            formData.append(`documents.files[${i}].file`, file ?? '', file.name ?? '');
+        for (let i = 0; i < fileList.length; i++) {
+            const file = fileList[i];
+            formData.append(`documents.files[${i}].file`, file.originFileObj as Blob, file.name ?? '');
             formData.append(`documents.files[${i}].name`, file.name ?? '');
             formData.append(`documents.files[${i}].description`, 'it\'s attachment uploaded from create case');
-        });
+        }
 
         return formData;
     }

@@ -3,10 +3,11 @@ import { Select, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { Litigant } from '@/shared/types/lookup';
 import { useLookup } from '@/shared/hooks/useLookup';
+import { useDebounce } from '@/shared/hooks/useDebounce';
 
 interface LitigantSearchProps {
     value?: Litigant[] | Litigant | number | string;
-    onChange: (value: Litigant[] | Litigant | null) => void;
+    onChange?: (value: Litigant[] | Litigant | null) => void;
     placeholder?: string;
     allowClear?: boolean;
     disabled?: boolean;
@@ -36,26 +37,24 @@ export const LitigantSearch: React.FC<LitigantSearchProps> = ({
     const [loading, setLoading] = useState(false);
     const [searchValue, setSearchValue] = useState('');
 
-    useEffect(() => {
-        const timeoutId = setTimeout(async () => {
-            if (searchValue.trim()) {
-                setLoading(true);
-                try {
-                    const results = await searchLitigants(searchValue);
-                    setLitigants(results);
-                } catch (error) {
-                    console.error('Search error:', error);
-                    setLitigants([]);
-                } finally {
-                    setLoading(false);
-                }
-            } else {
-                setLitigants([]);
-            }
-        }, debounceMs);
+    const [debouncedSearchValue, isDebouncing] = useDebounce(searchValue, debounceMs);
 
-        return () => clearTimeout(timeoutId);
-    }, [searchValue, searchLitigants, debounceMs]);
+    useEffect(() => {
+        const performSearch = async () => {
+            setLoading(true);
+            try {
+                const results = await searchLitigants(debouncedSearchValue);
+                setLitigants(results);
+            } catch (error) {
+                console.error('Search error:', error);
+                setLitigants([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        performSearch();
+    }, [debouncedSearchValue, searchLitigants]);
 
     const getValue = () => {
         if (!value) return undefined;
@@ -68,13 +67,13 @@ export const LitigantSearch: React.FC<LitigantSearchProps> = ({
 
     const handleChange = (selectedValue: number | string | (number | string)[]) => {
         if (Array.isArray(selectedValue)) {
-            const selectedLitigants = selectedValue.map(id => 
+            const selectedLitigants = selectedValue.map(id =>
                 litigants.find(litigant => litigant.id === id)
             ).filter(Boolean) as Litigant[];
-            onChange(selectedLitigants);
+            onChange?.(selectedLitigants);
         } else {
             const selectedLitigant = litigants.find(litigant => litigant.id === selectedValue);
-            onChange(selectedLitigant || null);
+            onChange?.(selectedLitigant || null);
         }
     };
 
@@ -96,14 +95,14 @@ export const LitigantSearch: React.FC<LitigantSearchProps> = ({
             placeholder={placeholder || t('CASES.SEARCH_LITIGANTS')}
             allowClear={allowClear}
             disabled={disabled}
-            loading={loading}
+            loading={loading || isDebouncing}
             filterOption={false}
             defaultActiveFirstOption={false}
             mode={mode}
             size={size}
             style={style}
             className={className}
-            notFoundContent={loading ? <Spin size="small" /> : t('CASES.NO_DATA')}
+            notFoundContent={loading || isDebouncing ? <Spin size="small" /> : t('CASES.NO_DATA')}
         >
             {litigants.map((litigant) => (
                 <Select.Option key={litigant.id} value={litigant.id} label={getDisplayName(litigant)}>

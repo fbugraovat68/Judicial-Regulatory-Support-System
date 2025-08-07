@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Tabs, Dropdown, Typography } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useCase } from '@/features/cases/hooks/useCases';
+import { useCaseDetails } from '@/features/cases/hooks/useCaseDetails';
 import { useModalStore } from '@/shared/stores/modalStore';
 import { LoadingSpinner } from '@/shared/components/common/LoadingSpinner';
 import { StatusBadge } from '@/shared/components/common/StatusBadge';
@@ -17,7 +17,7 @@ export const CaseDetails: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { open, isOpen } = useModalStore();
-  const { case: caseDetails, isLoading, error } = useCase(Number(id));
+  const { case: caseDetails, isLoading, error } = useCaseDetails(Number(id));
 
   const handleEdit = () => {
     open('createCase');

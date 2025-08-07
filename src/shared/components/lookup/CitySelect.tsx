@@ -7,7 +7,7 @@ import { useLookup } from '../../hooks/useLookup';
 interface CitySelectProps {
   districtId: number | null;
   value?: LookupItem | number | string;
-  onChange: (value: LookupItem | null) => void;
+  onChange?: (value: LookupItem | null) => void;
   placeholder?: string;
   allowClear?: boolean;
   disabled?: boolean;
@@ -47,7 +47,7 @@ export const CitySelect: React.FC<CitySelectProps> = ({
   // Handle option selection
   const handleChange = (selectedValue: number | string) => {
     const selectedCity = cities.find(city => city.id === selectedValue);
-    onChange(selectedCity || null);
+    onChange?.(selectedCity || null);
   };
 
   // Get display name based on current language

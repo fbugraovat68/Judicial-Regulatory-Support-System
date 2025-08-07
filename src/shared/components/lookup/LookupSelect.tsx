@@ -7,7 +7,7 @@ import { useLookup } from '../../hooks/useLookup';
 interface LookupSelectProps {
   lookupType: LookupTypes;
   value?: LookupItem | number | string;
-  onChange: (value: LookupItem | null) => void;
+  onChange?: (value: LookupItem | null) => void;
   placeholder?: string;
   allowClear?: boolean;
   disabled?: boolean;
@@ -61,7 +61,7 @@ export const LookupSelect: React.FC<LookupSelectProps> = ({
   // Handle option selection
   const handleChange = (selectedValue: number | string) => {
     const selectedItem = items.find(item => item[codeField] === selectedValue);
-    onChange(selectedItem || null);
+    onChange?.(selectedItem || null);
   };
 
   // Get display name based on current language

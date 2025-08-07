@@ -72,6 +72,17 @@
     "SESSION_EXPIRED": "Session expired. Please login again."
   },
   "CASES": {
+    "UPLOADED_FILES": "Uploaded Files",
+    "FILE_COUNT": "files",
+    "REMOVE_FILE": "Remove file",
+    "UPLOAD_GUIDELINES": "Upload Guidelines",
+    "GUIDELINE_1": "Supported formats: .doc, .docx, .xls, .xlsx, .pdf, .zip",
+    "GUIDELINE_2": "Maximum file size: 10MB per file",
+    "GUIDELINE_3": "Maximum 10 files can be uploaded",
+    "GUIDELINE_4": "Duplicate files will be automatically rejected",
+    "LOCATION_AND_PARTIES": "Location & Parties",
+    "NO_ATTACHMENTS": "No attachments uploaded",
+    "PREVIEW": "Preview",
     "CASE": "Case",
     "CASES": "Cases",
     "NEW_CASE": "New Case",
@@ -224,7 +235,8 @@
     "FINANCIAL_INFORMATION": "Financial Information",
     "DECISION_INFORMATION": "Decision Information",
     "NOTICE_INFORMATION": "Notice Information",
-    "GRIEVANCE_INFORMATION": "Grievance Information"
+    "GRIEVANCE_INFORMATION": "Grievance Information",
+    "COURT_AND_LOCATION": "Court and Location"
   },
   "DOCUMENTS": {
     "DOCUMENT": "Document",

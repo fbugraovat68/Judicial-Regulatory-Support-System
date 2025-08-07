@@ -7,6 +7,8 @@ import { useModalStore } from '@/shared/stores/modalStore';
 import type { CaseRequest } from '../../types/case-request';
 import { CaseInfoStep } from './case-steps/CaseInfoStep';
 import { DecisionInfoStep } from './case-steps/DecisionInfoStep';
+import { AttachmentsStep } from './case-steps/AttachmentsStep';
+import { PreviewStep } from './case-steps/PreviewStep';
 import { CaseHelper } from '../../helpers/case-helper';
 
 const { Step } = Steps;
@@ -20,7 +22,7 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
   const { t } = useTranslation();
   const { createCase, isCreating } = useCases();
   const { isOpen, close } = useModalStore();
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<CaseRequest>();
   const [currentStep, setCurrentStep] = useState(0);
   const [fileList, setFileList] = useState<any[]>([]);
   const [tags, setTags] = useState<string[]>([]);
@@ -28,7 +30,9 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
 
   const steps = [
     { title: t('CASES.CASE_INFO'), key: 'caseInfo' },
-    { title: t('CASES.DECISION_INFO'), key: 'decisionInfo' }
+    { title: t('CASES.DECISION_INFO'), key: 'decisionInfo' },
+    { title: t('CASES.ATTACHMENTS'), key: 'attachments' },
+    { title: t('CASES.PREVIEW'), key: 'preview' }
   ];
 
   const handleNext = async () => {
@@ -36,11 +40,15 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
       // Define which fields belong to each step (matching CaseRequest structure)
       const stepFields = {
         0: ['name', 'description', 'number', 'isAgainstStc', 'caseFilingDate', 'caseLevel', 'internalClient', 'caseType', 'lawsuitType', 'specializedCourt', 'district', 'city', 'litigants', 'additionalConsultants', 'tags'],
-        1: ['caseInformation.decisionNumber', 'caseInformation.decisionDate', 'caseInformation.noticeNumber', 'caseInformation.noticeDate', 'caseInformation.inquiryNumber', 'caseInformation.inquiryDate', 'caseInformation.repaymentAmount', 'caseInformation.repaymentDate', 'caseInformation.grievanceRequestNumber', 'caseInformation.grievanceRequestDate', 'caseInformation.fineAmount', 'caseInformation.lossRatio', 'caseInformation.isConfidential', 'caseInformation.consultantOpinion', 'caseInformation.priority']
+        1: ['caseInformation.decisionNumber', 'caseInformation.decisionDate', 'caseInformation.noticeNumber', 'caseInformation.noticeDate', 'caseInformation.inquiryNumber', 'caseInformation.inquiryDate', 'caseInformation.repaymentAmount', 'caseInformation.repaymentDate', 'caseInformation.grievanceRequestNumber', 'caseInformation.grievanceRequestDate', 'caseInformation.fineAmount', 'caseInformation.lossRatio', 'caseInformation.isConfidential', 'caseInformation.consultantOpinion', 'caseInformation.priority'],
+        2: [], // Attachments step - no form validation needed
+        3: []  // Preview step - no form validation needed
       };
 
-      // Validate only current step fields
-      await form.validateFields(stepFields[currentStep as keyof typeof stepFields]);
+      // Validate only current step fields (skip validation for attachments and preview steps)
+      if (currentStep < 2) {
+        await form.validateFields(stepFields[currentStep as keyof typeof stepFields]);
+      }
 
       if (currentStep < steps.length - 1) {
         setCurrentStep(currentStep + 1);
@@ -57,22 +65,16 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
   const handleSubmit = async () => {
     try {
       await form.validateFields();
-
-      if (mode === 'edit' && caseData) {
-        // TODO: Implement edit functionality
-        message.info('Edit functionality coming soon');
-      } else {
-        const createCaseRequest = CaseHelper.prepareCaseRequest(form, tags);
-        const formData = CaseHelper.preparePayloadAsFormData(createCaseRequest, fileList);
-        const caseDetails = await createCase(formData);
-        console.log(caseDetails);
-        message.success(`Case ${caseDetails.name} created successfully`);
-        close('createCase');
-        form.resetFields();
-        setCurrentStep(0);
-        setFileList([]);
-        setTags([]);
-      }
+      const createCaseRequest = CaseHelper.prepareCaseRequest(form, tags);
+      const formData = CaseHelper.preparePayloadAsFormData(createCaseRequest, fileList);
+      const caseDetails = await createCase(formData);
+      console.log(caseDetails);
+      message.success(`Case ${caseDetails.name} created successfully`);
+      close('createCase');
+      form.resetFields();
+      setCurrentStep(0);
+      setFileList([]);
+      setTags([]);
     } catch (error) {
       message.error('Failed to create case');
     }
@@ -83,6 +85,7 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
     accept: '.doc,.docx,.xls,.xlsx,.pdf,.zip',
     maxCount: 10,
     fileList,
+    showUploadList: false,
     beforeUpload: (file: File) => {
       const isValidType = [
         'application/msword',
@@ -132,9 +135,43 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
 
   const modalTitle = mode === 'edit' ? t('CASES.EDIT_CASE') : t('CASES.CREATE_NEW_CASE');
 
+  const renderStepContent = () => {
+    return (
+      <>
+        <div style={{ display: currentStep === 0 ? 'block' : 'none' }}>
+          <CaseInfoStep
+            form={form}
+            mode={mode}
+            tags={tags}
+            setTags={setTags}
+            inputTag={inputTag}
+            setInputTag={setInputTag}
+          />
+        </div>
+        <div style={{ display: currentStep === 1 ? 'block' : 'none' }}>
+          <DecisionInfoStep form={form} />
+        </div>
+        <div style={{ display: currentStep === 2 ? 'block' : 'none' }}>
+          <AttachmentsStep
+            uploadProps={uploadProps}
+            fileList={fileList}
+            setFileList={setFileList}
+          />
+        </div>
+        <div style={{ display: currentStep === 3 ? 'block' : 'none' }}>
+          <PreviewStep
+            form={form}
+            tags={tags}
+            fileList={fileList}
+            mode={mode}
+          />
+        </div>
+      </>
+    );
+  };
+
   return (
     <>
-
       <Modal
         title={modalTitle}
         open={isOpen('createCase')}
@@ -156,21 +193,7 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
           initialValues={caseData}
           className="create-case-form"
         >
-          <div style={{ display: currentStep === 0 ? 'block' : 'none' }}>
-            <CaseInfoStep
-              form={form}
-              mode={mode}
-              tags={tags}
-              setTags={setTags}
-              inputTag={inputTag}
-              setInputTag={setInputTag}
-              uploadProps={uploadProps}
-            />
-          </div>
-
-          <div style={{ display: currentStep === 1 ? 'block' : 'none' }}>
-            <DecisionInfoStep form={form} />
-          </div>
+          {renderStepContent()}
 
           <div className="flex justify-between mt-6">
             <Button onClick={() => close('createCase')}>
@@ -194,7 +217,7 @@ export const CreateCaseModal: React.FC<CreateCaseModalProps> = ({ mode = 'create
                   onClick={handleSubmit}
                   loading={isCreating}
                 >
-                  {mode === 'edit' ? t('COMMON.UPDATE') : t('COMMON.CREATE')}
+                  {mode === 'edit' ? t('CASES.UPDATE') : t('CASES.CREATE')}
                 </Button>
               )}
             </div>

@@ -28,7 +28,7 @@ interface District extends LookupItem { }
 interface City extends LookupItem { }
 interface Litigant extends UserData { }
 interface AdditionalConsultant extends UserData { }
-interface Tag { id: number; value: string; }
+// interface Tag { id: number; value: string; }
 
 interface CaseInformation {
     decisionNumber: number;
@@ -62,7 +62,7 @@ export interface CaseRequest {
     city: City;
     litigants: Litigant[];
     additionalConsultants: AdditionalConsultant[];
-    tags: Tag[];
+    tags: string[];
     caseInformation: CaseInformation;
     documents?: CaseDocument;
 }

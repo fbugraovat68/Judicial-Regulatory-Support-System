@@ -72,6 +72,17 @@
     "SESSION_EXPIRED": "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى."
   },
   "CASES": {
+    "UPLOADED_FILES": "الملفات المرفقة",
+    "FILE_COUNT": "ملف",
+    "REMOVE_FILE": "إزالة الملف",
+    "UPLOAD_GUIDELINES": "إرشادات الرفع",
+    "GUIDELINE_1": "الصيغ المدعومة: .doc, .docx, .xls, .xlsx, .pdf, .zip",
+    "GUIDELINE_2": "الحد الأقصى لحجم الملف: 10 ميجابايت لكل ملف",
+    "GUIDELINE_3": "يمكن رفع 10 ملفات كحد أقصى",
+    "GUIDELINE_4": "سيتم رفض الملفات المكررة تلقائياً",
+    "LOCATION_AND_PARTIES": "الموقع والأطراف",
+    "NO_ATTACHMENTS": "لا توجد مرفقات",
+    "PREVIEW": "معاينة",
     "CASE": "قضية",
     "CASES": "قضايا",
     "NEW_CASE": "قضية جديدة",
@@ -224,7 +235,8 @@
     "FINANCIAL_INFORMATION": "المعلومات المالية",
     "DECISION_INFORMATION": "معلومات القرار",
     "NOTICE_INFORMATION": "معلومات الإشعار",
-    "GRIEVANCE_INFORMATION": "معلومات التظلم"
+    "GRIEVANCE_INFORMATION": "معلومات التظلم",
+    "COURT_AND_LOCATION": "المحكمة والموقع"
   },
   "DOCUMENTS": {
     "DOCUMENT": "مستند",

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Select, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useLookup } from '@/shared/hooks/useLookup';
+import { useDebounce } from '@/shared/hooks/useDebounce';
 import type { Consultant } from '@/shared/types/lookup';
 
 interface ConsultantSearchProps {
     value?: Consultant[] | Consultant | number | string;
-    onChange: (value: Consultant[] | Consultant | null) => void;
+    onChange?: (value: Consultant[] | Consultant | null) => void;
     placeholder?: string;
     allowClear?: boolean;
     disabled?: boolean;
@@ -31,31 +32,29 @@ export const ConsultantSearch: React.FC<ConsultantSearchProps> = ({
 }) => {
     const { t } = useTranslation();
     const { searchConsultants } = useLookup();
-    
+
     const [consultants, setConsultants] = useState<Consultant[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchValue, setSearchValue] = useState('');
 
-    useEffect(() => {
-        const timeoutId = setTimeout(async () => {
-            if (searchValue.trim()) {
-                setLoading(true);
-                try {
-                    const results = await searchConsultants(searchValue);
-                    setConsultants(results);
-                } catch (error) {
-                    console.error('Search error:', error);
-                    setConsultants([]);
-                } finally {
-                    setLoading(false);
-                }
-            } else {
-                setConsultants([]);
-            }
-        }, debounceMs);
+    const [debouncedSearchValue, isDebouncing] = useDebounce(searchValue, debounceMs);
 
-        return () => clearTimeout(timeoutId);
-    }, [searchValue, searchConsultants, debounceMs]);
+    useEffect(() => {
+        const performSearch = async () => {
+            setLoading(true);
+            try {
+                const results = await searchConsultants(debouncedSearchValue);
+                setConsultants(results);
+            } catch (error) {
+                console.error('Search error:', error);
+                setConsultants([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        performSearch();
+    }, [debouncedSearchValue, searchConsultants]);
 
     const handleSearch = (newValue: string) => {
         setSearchValue(newValue);
@@ -96,14 +95,14 @@ export const ConsultantSearch: React.FC<ConsultantSearchProps> = ({
             placeholder={placeholder || t('CASES.SEARCH_CONSULTANTS')}
             allowClear={allowClear}
             disabled={disabled}
-            loading={loading}
+            loading={loading || isDebouncing}
             filterOption={false}
             defaultActiveFirstOption={false}
             mode={mode}
             size={size}
             style={style}
             className={className}
-            notFoundContent={loading ? <Spin size="small" /> : null}
+            notFoundContent={loading || isDebouncing ? <Spin size="small" /> : t('CASES.NO_DATA')}
         >
             {consultants.map((consultant) => (
                 <Select.Option key={consultant.id} value={consultant.id} label={getDisplayName(consultant)}>

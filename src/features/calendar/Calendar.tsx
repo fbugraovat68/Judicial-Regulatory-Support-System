@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar as AntCalendar, Badge, Modal, Form, Input, Select, Button, message, Typography } from 'antd';
+import { Calendar as AntCalendar, Badge, Modal, Form, Input, Select, Button, notification, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useCalendar } from '@/features/calendar/hooks/useCalendar';
@@ -53,11 +53,11 @@ export const Calendar: React.FC = () => {
         ...values,
         date: selectedDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
       });
-      message.success('Event created successfully');
+      notification.success({ message: 'Event created successfully' });
       setIsModalOpen(false);
       form.resetFields();
     } catch (error) {
-      message.error('Failed to create event');
+      notification.error({ message: 'Failed to create event' });
     }
   };
 

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { message } from 'antd';
+import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 interface UseCaseActionsProps {
@@ -20,7 +20,7 @@ export const useCaseActions = ({
     const { t } = useTranslation();
 
     const handleViewCase = useCallback((caseId: number) => navigate(`/cases/${caseId}`), [navigate]);
-    const handleEditCase = useCallback((caseId: number) => message.info(t('CASES.EDIT_FUNCTIONALITY_COMING'), caseId), [t]);
+    const handleEditCase = useCallback((caseId: number) => notification.info({ message: `${t('CASES.EDIT_FUNCTIONALITY_COMING')} ${caseId}` }), [t]);
     const handleDeleteCase = useCallback((caseId: number) => {
         setCaseToDelete(caseId);
         setDeleteModalVisible(true);
@@ -30,11 +30,11 @@ export const useCaseActions = ({
         if (caseToDelete) {
             try {
                 deleteCase(caseToDelete);
-                message.success(t('CASES.CASE_DELETED_SUCCESS'));
+                notification.success({ message: t('CASES.CASE_DELETED_SUCCESS') });
                 setDeleteModalVisible(false);
                 setCaseToDelete(null);
             } catch (error) {
-                message.error(t('CASES.CASE_DELETE_FAILED'));
+                notification.error({ message: t('CASES.CASE_DELETE_FAILED') });
             }
         }
     }, [caseToDelete, deleteCase, setDeleteModalVisible, setCaseToDelete, t]);
