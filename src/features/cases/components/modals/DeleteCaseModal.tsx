@@ -19,6 +19,8 @@ export const DeleteCaseModal: React.FC<DeleteCaseModalProps> = ({
 
     return (
         <Modal
+            centered={true}
+            closable={false}
             title={t('CASES.CONFIRM_DELETE')}
             open={visible}
             onOk={onConfirm}

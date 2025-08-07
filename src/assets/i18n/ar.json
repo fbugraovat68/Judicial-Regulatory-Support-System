@@ -236,7 +236,13 @@
     "DECISION_INFORMATION": "معلومات القرار",
     "NOTICE_INFORMATION": "معلومات الإشعار",
     "GRIEVANCE_INFORMATION": "معلومات التظلم",
-    "COURT_AND_LOCATION": "المحكمة والموقع"
+    "COURT_AND_LOCATION": "المحكمة والموقع",
+    "TOTAL_CASES": "إجمالي القضايا",
+    "ACTIVE_CASES": "القضايا النشطة",
+    "COMPLETED_CASES": "القضايا المكتملة",
+    "PENDING_CASES": "القضايا المعلقة",
+    "MANAGE_AND_TRACK_YOUR_LEGAL_CASES": "إدارة وتتبع قضاياك القانونية بكفاءة",
+    "VIEW_CASE_DETAILS": "عرض تفاصيل القضية"
   },
   "DOCUMENTS": {
     "DOCUMENT": "مستند",
@@ -311,9 +317,6 @@
     "PASSWORD_MISMATCH": "كلمات المرور غير متطابقة",
     "INVALID_FORMAT": "تنسيق غير صحيح"
   },
-  "TOTAL_CASES": "إجمالي القضايا",
-  "ACTIVE_CASES": "القضايا النشطة",
-  "COMPLETED_CASES": "القضايا المكتملة",
   "PENDING_CASES": "القضايا المعلقة",
   "CASE_TRENDS": "اتجاهات القضايا",
   "RECENT_CASES": "القضايا الحديثة",

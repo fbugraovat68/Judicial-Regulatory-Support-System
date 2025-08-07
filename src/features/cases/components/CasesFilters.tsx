@@ -66,14 +66,7 @@ export const CasesFilters: React.FC<CasesFiltersProps> = ({
     const activeFiltersCount = getActiveFiltersCount();
 
     return (
-        <Card
-            className="cases-filters-card"
-            style={{
-                borderRadius: '12px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                border: '1px solid #f0f0f0'
-            }}
-        >
+        <Card className="cases-filters-card border border-gray-200 rounded-xl">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center space-x-3">
@@ -217,14 +210,14 @@ export const CasesFilters: React.FC<CasesFiltersProps> = ({
                     {/* Action Buttons */}
                     <Col xs={24} sm={24} md={12}>
                         <div className="flex items-end h-full">
-                        <Space className="w-full flex justify-end items-end gap-2">
-                            <Button
-                                icon={<ReloadOutlined />}
-                                onClick={onReset}
-                            >
-                                {t('CASES.CLEAR')}
-                            </Button>
-                        </Space>
+                            <Space className="w-full flex justify-end items-end gap-2">
+                                <Button
+                                    icon={<ReloadOutlined />}
+                                    onClick={onReset}
+                                >
+                                    {t('CASES.CLEAR')}
+                                </Button>
+                            </Space>
                         </div>
                     </Col>
                 </Row>

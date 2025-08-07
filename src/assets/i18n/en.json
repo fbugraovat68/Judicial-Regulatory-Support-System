@@ -236,7 +236,14 @@
     "DECISION_INFORMATION": "Decision Information",
     "NOTICE_INFORMATION": "Notice Information",
     "GRIEVANCE_INFORMATION": "Grievance Information",
-    "COURT_AND_LOCATION": "Court and Location"
+    "COURT_AND_LOCATION": "Court and Location",
+    "TOTAL_CASES": "Total Cases",
+    "ACTIVE_CASES": "Active Cases",
+    "COMPLETED_CASES": "Completed Cases",
+    "PENDING_CASES": "Pending Cases",
+    "MANAGE_AND_TRACK_YOUR_LEGAL_CASES": "Manage and track your legal cases efficiently",
+    "VIEW_CASE_DETAILS": "View case details",
+    "DELETE_CASE_CONFIRMATION": "This action will permanently delete the selected case and all its associated information. Please confirm that you want to proceed with deleting this case. This operation cannot be undone."
   },
   "DOCUMENTS": {
     "DOCUMENT": "Document",
@@ -311,9 +318,6 @@
     "PASSWORD_MISMATCH": "Passwords do not match",
     "INVALID_FORMAT": "Invalid format"
   },
-  "TOTAL_CASES": "Total Cases",
-  "ACTIVE_CASES": "Active Cases",
-  "COMPLETED_CASES": "Completed Cases",
   "PENDING_CASES": "Pending Cases",
   "CASE_TRENDS": "Case Trends",
   "RECENT_CASES": "Recent Cases",

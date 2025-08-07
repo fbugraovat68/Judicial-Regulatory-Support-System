@@ -14,8 +14,7 @@ export type CaseStatus = typeof CaseStatus[keyof typeof CaseStatus];
 export const CasePriority = {
   LOW: 'LOW',
   MEDIUM: 'MEDIUM',
-  HIGH: 'HIGH',
-  URGENT: 'URGENT'
+  HIGH: 'HIGH'
 } as const;
 
 export type CasePriority = typeof CasePriority[keyof typeof CasePriority];
