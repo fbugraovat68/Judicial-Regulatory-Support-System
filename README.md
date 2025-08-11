@@ -40,22 +40,46 @@ npm run dev
 src/
 ├── features/           # Feature-based modules
 │   ├── auth/          # Authentication system
+│   │   ├── guards/    # Route protection
+│   │   ├── hooks/     # User management hooks
+│   │   ├── services/  # User services
+│   │   ├── stores/    # Permission & user stores
+│   │   └── types/     # User type definitions
 │   ├── admin/         # Admin functionality
+│   │   ├── components/ # Admin components
+│   │   ├── hooks/     # Admin hooks
+│   │   └── services/  # Admin services
 │   ├── calendar/      # Calendar feature
+│   │   ├── components/ # Calendar components
+│   │   ├── hooks/     # Calendar hooks
+│   │   └── services/  # Calendar services
 │   ├── dashboard/     # Dashboard
+│   │   ├── components/ # Dashboard components
+│   │   ├── hooks/     # Dashboard hooks
+│   │   ├── services/  # Dashboard services
+│   │   ├── stores/    # Dashboard state
+│   │   └── types/     # Dashboard types
 │   └── cases/         # Case management
+│       ├── components/ # Case components & modals
+│       ├── helpers/    # Case utility functions
+│       ├── hooks/      # Case management hooks
+│       ├── schemas/    # Validation schemas
+│       ├── services/   # Case-related services
+│       ├── stores/     # Case state management
+│       └── types/      # Case type definitions
 ├── shared/            # Shared components & utilities
 │   ├── components/    # Reusable UI components
-│   │   ├── common/    # Common components
+│   │   ├── common/    # Common components (LoadingSpinner, StatusBadge, etc.)
 │   │   ├── guards/    # Route guards
-│   │   └── layout/    # Layout components
+│   │   ├── layout/    # Layout components (Header, Sidebar, Footer)
+│   │   └── lookup/    # Lookup components (CitySelect, ConsultantSearch, etc.)
 │   ├── stores/        # Zustand state stores
 │   ├── hooks/         # Custom React hooks
 │   ├── utils/         # Utility functions
 │   ├── types/         # TypeScript type definitions
 │   └── constants/     # Application constants
 ├── config/            # Configuration files
-├── assets/            # Static assets
+├── assets/            # Static assets & i18n files
 ├── App.tsx            # Main application component
 ├── main.tsx           # Application entry point
 └── index.css          # Global styles
@@ -179,6 +203,10 @@ const MyComponent = () => {
 - **Notification Store**: App-wide notifications
 - **Page Store**: Navigation and page state
 - **Modal Store**: Modal state management
+- **Case Store**: Case management state
+- **Filters Store**: Case filtering state
+- **User Store**: User authentication state
+- **Permission Store**: User permissions state
 
 ### React Query
 - **Server State**: Efficient data fetching and caching
@@ -210,34 +238,53 @@ const MyComponent = () => {
 - [x] Zustand state management
 - [x] React Query for server state
 - [x] Feature-based architecture
-- [x] Authentication system
-- [x] Layout components
+- [x] Authentication system with guards
+- [x] Layout components (Header, Sidebar, Footer)
+- [x] Common UI components (LoadingSpinner, StatusBadge, SearchInput)
+- [x] Lookup components (CitySelect, ConsultantSearch, LitigantSearch)
+- [x] Modal system with store management
+- [x] Notification system
 - [x] CSS fixes and optimizations
+- [x] Case management structure and components
+- [x] Case creation modal with multi-step form
+- [x] Case details, list, and table components
+- [x] Case filtering and search functionality
+- [x] Document management system
+- [x] Event and judgment services
+- [x] Team member management
+- [x] Admin panel structure
+- [x] Calendar feature structure
+- [x] Dashboard structure
 
 ### 🚧 In Progress
-- [ ] Component migration from Angular
-- [ ] API integration and services
-- [ ] Form components with validation
-- [ ] Modal and dialog components
+- [ ] API integration and service implementation
+- [ ] Form validation with Zod schemas
+- [ ] Real-time data synchronization
+- [ ] Advanced filtering and search
 
 ### 📋 Todo
-- [ ] Case management features
-- [ ] Document upload functionality
-- [ ] Calendar integration
-- [ ] Admin panel features
-- [ ] Testing setup (Jest)
-- [ ] Performance optimization
-- [ ] PWA features
+- [ ] Testing setup (Jest + React Testing Library)
+- [ ] Performance optimization and monitoring
+- [ ] PWA features and offline support
+- [ ] Advanced reporting and analytics
+- [ ] Bulk operations for cases
+- [ ] Advanced calendar features
+- [ ] Document workflow management
+- [ ] User activity tracking
+- [ ] Audit logging system
 
 ## 🌟 Key Features
 
-1. **Modern Architecture**: Feature-based organization
-2. **Type Safety**: Full TypeScript support
-3. **Performance**: React Query, code splitting, lazy loading
-4. **Accessibility**: ARIA-compliant components
-5. **Internationalization**: Multi-language with RTL support
-6. **Responsive Design**: Mobile-first approach
-7. **Developer Experience**: Hot reload, fast builds, path aliases
+1. **Modern Architecture**: Feature-based organization with clear separation of concerns
+2. **Type Safety**: Full TypeScript support with comprehensive type definitions
+3. **Performance**: React Query, code splitting, lazy loading, and optimized builds
+4. **Accessibility**: ARIA-compliant components with keyboard navigation
+5. **Internationalization**: Multi-language support with full RTL support for Arabic
+6. **Responsive Design**: Mobile-first approach with TailwindCSS utilities
+7. **Developer Experience**: Hot reload, fast builds, path aliases, and comprehensive tooling
+8. **State Management**: Efficient client and server state management with Zustand and React Query
+9. **Form Handling**: Robust form management with React Hook Form and Zod validation
+10. **Component Library**: Rich set of reusable components with consistent design system
 
 ## 🤝 Contributing
 
@@ -247,6 +294,8 @@ const MyComponent = () => {
 4. Include translations for new text
 5. Test components thoroughly
 6. Follow the existing code patterns
+7. Use the established component patterns and hooks
+8. Maintain consistent styling with TailwindCSS and Ant Design
 
 ## 📄 License
 
@@ -261,11 +310,23 @@ The global CSS file (`src/index.css`) follows proper CSS import order:
 3. Custom styles and overrides
 
 ### State Management Pattern
-- **Client State**: Zustand for UI state
-- **Server State**: React Query for API data
-- **Form State**: React Hook Form for forms
+- **Client State**: Zustand for UI state (modals, notifications, page state)
+- **Server State**: React Query for API data (cases, users, documents)
+- **Form State**: React Hook Form for forms with Zod validation
 
 ### Component Organization
-- **Shared Components**: Reusable across features
-- **Feature Components**: Specific to business logic
-- **Layout Components**: Page structure and navigation
+- **Shared Components**: Reusable across features (LoadingSpinner, StatusBadge, etc.)
+- **Feature Components**: Specific to business logic (CaseDetails, Admin, etc.)
+- **Layout Components**: Page structure and navigation (Header, Sidebar, Footer)
+
+### API Integration
+- **Service Layer**: Organized by feature with clear separation
+- **Error Handling**: Consistent error handling across all services
+- **Type Safety**: Full TypeScript integration for API responses
+- **Caching**: React Query for efficient data caching and synchronization
+
+### Performance Considerations
+- **Code Splitting**: Route-based and component-based splitting
+- **Lazy Loading**: Suspense boundaries for async components
+- **Memoization**: Strategic use of React.memo and useMemo
+- **Bundle Optimization**: Manual chunk configuration for vendor libraries
